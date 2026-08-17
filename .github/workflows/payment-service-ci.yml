@@ -1,0 +1,41 @@
+name: Payment Service CI
+
+on:
+  push:
+    branches: [ "main", "master" ]
+    paths: 
+      - 'payment-service/**'
+  pull_request:
+    branches: [ "main", "master" ]
+    paths: 
+      - 'payment-service/**'
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./payment-service
+
+    strategy:
+      matrix:
+        node-version: [20.x]
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          cache-dependency-path: './payment-service/package-lock.json'
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Rodar testes
+        run: npm test
